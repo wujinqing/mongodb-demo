@@ -46,6 +46,13 @@
 
 > 如果字段field不存在，则会自动新增字段，并设置默认值为value。
 
+> 修改数组中的第一个元素( **email.0** )：db.personalinfo.update({_id:ObjectId("59d5b0847fa0475f2020e0da")}, {$set: {'email.0': 'a1@a1.com'}})
+
+> 修改查询结果数组中的元素( **address.$.city** ), 不知道数组下标:
+
+> db.personalinfo.update({'address.city': 'beijing'}, {$set: {'address.$.city': 'chaoyang'}}) 默认修改第一个，如果multi设置为true则会修改多个。
+
+
 
 ### $unset
 
