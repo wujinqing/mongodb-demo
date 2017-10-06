@@ -40,7 +40,7 @@
 |名称|描述|用法|
 |---|---|---|
 |$exists|判断是否有这个字段。|{ field: { $exists: \<boolean> } }|
-|$type|判断字段是否是指定的类型列表中的其中一个，只要满足一个就行。类型参考 **附录**|{ field: { $type: \[ \<BSON type1> , \<BSON type2>, ... ] } }|
+|$type|判断字段是否是指定的类型列表中的其中一个，只要满足一个就行。类型参考 **[附录B](#B)**|{ field: { $type: \[ \<BSON type1> , \<BSON type2>, ... ] } }|
 
 
 
@@ -50,11 +50,11 @@
 
 ### 附录
 
-##### 附录A
+##### [附录A](#A)
 
 ![nor](img/operator/nor.png)
 
-##### 附录B
+##### [附录B](#B)
 ![nor](img/operator/types.png)
 
 ![nor](img/operator/types02.png)
