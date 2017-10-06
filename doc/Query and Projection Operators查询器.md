@@ -50,11 +50,11 @@
 
 ### 附录
 
-##### [附录A](#A)
+##### <A ID="A">附录A</A>
 
 ![nor](img/operator/nor.png)
 
-##### [附录B](#B)
+##### <A ID="B">附录B</A>
 ![nor](img/operator/types.png)
 
 ![nor](img/operator/types02.png)
