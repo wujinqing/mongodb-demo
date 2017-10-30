@@ -58,6 +58,73 @@ db.personalinfo.findAndModify({
 
 
 
+> 示例1：db.personalinfo.find({myage: null}) 会返回不包含myage字段的及myage=null的记录。
+
+> 示例2：db.personalinfo.find({myage: {$in: \[null], $exists:true}})返回有myage字段的切myage字段的值为null.
+
+> 示例3：db.personalinfo.find({name:/a/}) 模糊查询，名字包含a的
+
+> 示例4：db.personalinfo.find({name:/^z/}) 模糊查询，名字以z开头的
+
+> 示例5：db.personalinfo.find({$where: 'this.age > 11'}): where用于复杂查询。
+
+> 示例6：var myExp = function(){return this.age > 10}
+
+> db.personalinfo.find(myExp)
+
+> 示例7：db.test.find({$where: 'this.a + this.b + this.c == 11'})
+
+> 示例8：db.test.find({$where: 'function(){return this.a + this.b + this.c == 11}'})
+
+
+
+
+### db.collection.count(query, options)
+
+> 统计查询结果的数量
+
+##### 参数说明
+
+|字段|类型|描述|
+|---|---|---|
+|query|document|查询条件|
+|options|document|可选的，额外的参数用于修改数量|
+
+##### 参数说明
+
+|字段|类型|描述|
+|---|---|---|
+|limit|integer|类似SQL里面的limit|
+|skip|integer|跳过多少条|
+|limit|integer|类似SQL里面的limit|
+
+
+
+> 示例1：db.collection.find(query).count()
+
+> db.orders.count()
+
+> db.orders.find().count()
+
+> db.orders.count( { ord_dt: { $gt: new Date('01/01/2012') } } )
+
+> db.orders.find( { ord_dt: { $gt: new Date('01/01/2012') } } ).count()
+
+> 分页：db.personalinfo.find().skip(1).limit(1).count(true)
+
+> db.personalinfo.find().skip(1).limit(1).count() 这种count()会返回find出来的总条数
+
+
+
+### db.collection.group({ key, reduce, initial \[, keyf] \[, cond] \[, finalize] })
+
+> db.mygroup.group({key: {count:1}, initial:{minAge:0, count:0}, reduce: function(curr, aggregator){aggregator.count++; if(aggregator.count ==1){aggregator.minAge = curr.age};if(aggregator.minAge > curr.age){aggregator.minAge = curr.age}}})
+
+
+
+
+
+
 
 
 

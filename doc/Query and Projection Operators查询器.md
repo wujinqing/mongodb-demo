@@ -22,7 +22,7 @@
 |---|---|---|
 |$and|逻辑运算符'与'，短路运算符|{ $and: \[ { \<expression1> }, { \<expression2> } , ... , { \<expressionN> } ] }|
 |$not|逻辑运算符’非’, 未包含字段field的数据也会返回|{ field: { $not: { \<operator-expression> } } }|
-|$nor|逻辑运算符‘既不也不’，只有全部表达式未true，才会返回true, 未包含字段field的数据也会返回，参考 **附录A** 示例|{ $nor: \[ { \<expression1> }, { \<expression2> }, ...  { \<expressionN> } ] }|
+|$nor|逻辑运算符‘既不也不’，只有全部表达式未true，才会返回true, 未包含字段field的数据也会返回，参考 **[附录A](#A)** 示例|{ $nor: \[ { \<expression1> }, { \<expression2> }, ...  { \<expressionN> } ] }|
 |$or|逻辑运算符‘或’|{ $or: \[ { \<expression1> }, { \<expression2> }, ... , { \<expressionN> } ] }|
 
 
@@ -34,6 +34,8 @@
 |$elemMatch|数组中至少一个元素同时满足指定的所有条件|{ \<field>: { $elemMatch: { \<query1>, \<query2>, ... } } }|
 |$size|数组中元素个数必须是指定个数|{ field: { $size: 2 } } |
 
+示例：
+> db.mydemo.find({myarray: {$size: 5}})
 
 ##### Element运算符
 
@@ -42,6 +44,16 @@
 |$exists|判断是否有这个字段。|{ field: { $exists: \<boolean> } }|
 |$type|判断字段是否是指定的类型列表中的其中一个，只要满足一个就行。类型参考 **[附录B](#B)**|{ field: { $type: \[ \<BSON type1> , \<BSON type2>, ... ] } }|
 
+
+
+
+> 升序：db.personalinfo.find().sort({age: 1})
+
+> 降序：db.personalinfo.find().sort({age: -1})
+
+> db.personalinfo.find().sort({age: 1, name: -1}) 先按age升序, 再按name降序
+
+> 去重：db.personalinfo.distinct('age')
 
 
 
