@@ -39,7 +39,21 @@
 
 
 
-
+### bin目录下的脚本
+|命令|中文说明|英文说明|
+|---|---|---|
+|mongod|数据库服务器|The database server.|
+|mongos|分区、分片路由|Sharding router|
+|mongo|连接数据库的客户端|The database shell (uses interactive javascript).|
+|mongodump|创建一个二进制的数据库内容的dump文件|Create a binary dump of the contents of a database.|
+|mongorestore|重新存储由mongodump命令导出的数据|Restore data from the output created by mongodump.|
+|mongoexport|将collection中的数据导出到json或者CSV|Export the contents of a collection to JSON or CSV.|
+|mongoimport|将JSON, CSV or TSV格式的数据导入|Import data from JSON, CSV or TSV.|
+|mongofiles|从GridFS中添加、获取或者删除文件|Put, get and delete files from GridFS.|
+|mongostat|显示一个正在运行的mongod/mongos的状态|Show the status of a running mongod/mongos.|
+|bsondump|将BSON格式的文件转换成人类可读的格式|Convert BSON files into human-readable formats.|
+|mongoreplay|Traffic capture and replay tool|Traffic capture and replay tool.|
+|mongotop|追踪读取和写入数据花费的时间|Track time spent reading and writing data.|
 
 
 
