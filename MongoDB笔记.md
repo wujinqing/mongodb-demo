@@ -239,39 +239,125 @@ db.personalinfo.update({"_id" : ObjectId("5b2bb94a1795f744e178ff51")}, {$push: {
 
 ![](img/p40.png)
 
+### "email.0" 按数组下标修改元素
+
+> db.personalinfo.update({"_id" : ObjectId("5b2c35a61795f744e178ff55")}, {"$set": {"email.0": "d@d.com"}})
+
+![](img/p41.png)
+
+### 删除集合
+
+> db.personal.drop()
+
+![](img/p42.png)
+
+### $ 匹配你所查到的那条记录(不知道数组下标)
+
+> db.personalinfo.update({"address.city": "beijing"}, {"$set": {"address.$.street": "chaoyang"}})
+
+
+![](img/p43.png)
+
+### "address\[0].city" 不能使用这种方式
+
+> db.personalinfo.update({"_id" : ObjectId("5b31731e1795f744e178ff56")}, {"$set": {"address[0].city": "hangzhou"}})
+
+
+![](img/p44.png)
+
+
+### update(query, obj, upsert, multi)
+
+> query: 查询条件
+
+> obj: 修改对象
+
+> upsert: update/insert 如果没有匹配对象是否插入对象obj，默认不插入。
+
+> multi: 默认情况下只更新查出来的第一条，设置为true表示会更新所有查询出来的文档。
+
+
+### upsert设置为true, 没有匹配项就插入(把查询条件和修改对象结合起来插入)
+
+> db.personalinfo.update({"name": "lisi"}, {"$inc": {"count": 3}}, true)
+
+![](img/p45.png)
+
+把查询条件和修改对象结合起来插入
+
+![](img/p46.png)
+
+multi: true 修改多条
+
+![](img/p48.png)
+
+### insert与save的区别
+
+> insert如果集合里面没有记录就插入，有的话就什么都不做。
+
+> save如果集合里面没有记录就插入，有的话就更新。
+
+![](img/p47.png)
+
+### getLastError 获取最近一次修改的影响行数
+
+![](img/p49.png)
+
+### db.runCommand(obj, extra, queryOptions)执行某个命令(另一种方式执行，如：db.personalinfo.update)
+
+### MongoDB的特点：客户端发送命令(如：插入)，无需等待执行结果，也不管成功与否就立马返回，所以很快。
 
 
 
+### MongoDB本身并没有事务的概念
 
+### findAndModify 原子操作，只会更新一条记录，返回老的或者新的记录，默认返回老的记录
 
+```javascript
+db.collection.findAndModify({
+    query: <document>,
+    sort: <document>,
+    remove: <boolean>,
+    update: <document>,
+    new: <boolean>,
+    fields: <document>,
+    upsert: <boolean>,
+    bypassDocumentValidation: <boolean>,
+    writeConcern: <document>,
+    collation: <document>,
+    arrayFilters: [ <filterdocument1>, ... ]
+});
 
+```
 
+> query：查询条件，如果匹配到多个仅仅只会选择一个去修改。
 
+> sort: 排序字段，类似order by. 指定哪些键来升序还是倒序。
 
+> remove: remove和update只能指定一个，不能都有。如果设置为true,会将查询出来的第一条文档删除，默认是false。
 
+> update: 指定修改的文档对象。
 
+> new: 默认false, 返回修改之前的文档，如果设置为true，将返回修改之后的新文档，对删除操作无效(会忽略掉这个选项)。
 
+> fieds: 指定需要返回的字段，fields: { field1: 1, field2: 1, ... }.
 
+> upsert：当设置为true, 当查询没有返回数据，将会插入。默认false
+>
+>
 
+```javascript
+db.personalinfo.findAndModify({
+query: {name: "zhangsan"},
+sort: {age: -1},
 
+update: {$set: {address: "ganzhou"}},
+new: true
+})
 
+```
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+![](img/p50.png)
 
 
 
