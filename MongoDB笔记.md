@@ -348,11 +348,10 @@ db.collection.findAndModify({
 
 ```javascript
 db.personalinfo.findAndModify({
-query: {name: "zhangsan"},
-sort: {age: -1},
-
-update: {$set: {address: "ganzhou"}},
-new: true
+    query: {name: "zhangsan"},
+    sort: {age: -1},
+    update: {$set: {address: "ganzhou"}},
+    new: true
 })
 
 ```
@@ -360,101 +359,191 @@ new: true
 ![](img/p50.png)
 
 
+```javascript
+db.personalinfo.findAndModify({
+    query: {name: "zhangsan"},
+    sort: {age: -1},
+    update: {$set: {address: "jian"}},
+    new: true,
+    fields: {name: 1, address: 1}
+})
 
+```
 
+![](img/p51.png)
 
 
+### MongoDB查询
 
+MongoDB的目标提供大批量数据的高效的查询。
 
+查询就两个方法:
 
+> db.collection.find()
 
+> db.collection.findOne()
 
+> find一般会带两个条件：一个查询条件，一个限制条件。
 
+查询age等于11的所有记录
 
+> db.personalinfo.find({age:11})
 
+![](img/p52.png)
 
+查询所有记录并返回name列(_id列默认都会返回), 返回: 1/true; 不返回: 0/false, 返回和不返回不能同时出现。
 
+> db.personalinfo.find({}, {name: 1})
 
+> db.personalinfo.find({}, {name: true})
+![](img/p53.png)
 
+所有字段都不返回，也会返回空文档
 
+![](img/p54.png)
 
+### $gt 大于， 语法：{field: {$gt: value} }
 
+> db.personalinfo.find({age: {$gt: 10}})
 
+![](img/p55.png)
 
+### $gte 大于等于， 语法：{field: {$gte: value} }
 
+> db.personalinfo.find({age: {$gte: 10}})
 
+![](img/p56.png)
 
+### $lt 小于， 语法：{field: {$lt: value} }
 
+> db.personalinfo.find({age: {$lt: 11}})
 
 
+![](img/p57.png)
 
+### $lte 小于等于， 语法：{ field: { $lte: value} }
 
+db.personalinfo.find({age: {$lte: 11}})
 
+![](img/p58.png)
 
+### 大于并且小于
 
+> db.personalinfo.find({age: {$gt: 10, $lt: 12}})
 
+![](img/p59.png)
 
+### $in 类似于SQL里面的IN， 语法：{ field: { $in: \[value1, value2, ... valueN] } }
 
+> db.personalinfo.find({name: {$in: \['lisi', 'wangwu']}})
 
+### $nin 类似于SQL里面的NOT IN， 语法：{ field: { $nin: \[value1, value2, ... valueN] } }
 
+> db.personalinfo.find({name: {$nin: \['lisi', 'wangwu']}})
 
 
+![](img/p61.png)
 
+### $eq 等于， 语法：{ field: { $eq: value } }
 
+> db.personalinfo.find({name: {$eq: 'lisi'}})
 
+等价于
 
+> db.personalinfo.find({name: 'lisi'})
 
+![](img/p62.png)
 
+### $ne 不等于或者不包含指定字段， 语法：{field: {$ne: value} }
 
+> db.personalinfo.find({name: {$ne: 'lisi'}})
 
+![](img/p63.png)
 
+### $all 包含全部元素, 目标字段必须是数组, 没有与SQL里面相对于的。， 语法：{ field: { $all: \[ value1 , value2 ... ] } }
 
+> db.address.find({name: {$all: \['beijing', 'tianjing']}})
 
+![](img/p60.png)
 
+### 数组下标
 
+name里面第二个元素等于tianjing的记录
 
+> db.address.find({'name.1': 'tianjing'})
 
+![](img/p64.png)
 
 
+### $exists 包含或者不包含某个字段
 
+> db.personalinfo.find({age: {$exists: true}})
 
+![](img/p65.png)
 
+### null： 字段值为null或者没有这个字段
 
+> db.personalinfo.find({age:null})
 
+![](img/p66.png)
 
+### age为null且必须存在这个字段(排除不含这个字段的记录)
 
+> db.personalinfo.find({age: {$eq: null, $exists:1}})
 
+![](img/p67.png)
 
+### 被5取模余数为2的数据
 
+> db.personalinfo.find({age: {$mod: \[5, 2]}})
 
+![](img/p68.png)
 
+### $ne 不等于, 会返回为null的和不包含该字段的。
 
+> db.personalinfo.find({age: {$ne: 5}})
 
+去除为null的和不包含该字段的
 
+> db.personalinfo.find({age: {$ne: 5, $exists:1, $ne: null}})
 
+![](img/p69.png)
 
+### $in 类似于SQL里面的IN
 
+> db.personalinfo.find({age: {$in: \[11, 12]}})
 
+![](img/p70.png)
 
 
+### $nin 类似于SQL里面的NOT IN
 
+> db.personalinfo.find({age: {$nin: \[11, 12]}})
 
+![](img/p71.png)
 
+### $size 数组长度为4的记录
 
+> db.mydemo.find({myarray: {$size: 4}})
 
+![](img/p72.png)
 
 
+### 模糊查询
 
+名字里面包含字母a的记录
 
+> db.personalinfo.find({name: /a/})
 
+名字以z开头
 
+> db.personalinfo.find({name: /^z/})
 
+名字以i结尾
 
+> db.personalinfo.find({name: /i$/})
 
-
-
-
-
+![](img/p73.png)
 
 
 
