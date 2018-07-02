@@ -674,9 +674,11 @@ group 无法操作分片，mapReduce可以。
 
 ![](img/p89.png)
 
+指定查询条件分组
 
+> db.mygroup.group({key: {count: true}, initial: {totalCount: 0}, reduce: function(current, aggregator){aggregator.totalCount+= current.count;}, cond:{count: {$gt: 1}}});
 
-
+![](img/p90.png)
 
 
 
