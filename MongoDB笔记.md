@@ -522,12 +522,23 @@ name里面第二个元素等于tianjing的记录
 
 ![](img/p71.png)
 
-### $size 数组长度为4的记录
+### $size: 针对数组的操作， 数组长度为4的记录
 
 > db.mydemo.find({myarray: {$size: 4}})
 
 ![](img/p72.png)
 
+### $all: 针对数组的操作，myarray同时含有1和4的记录
+
+> db.mydemo.find({myarray: {$all: \[1,4]}})
+
+![](img/p74.png)
+
+### $elemMatch 至少有一个元素匹配所有条件
+
+> db.mydemo.find({myarray: {$elemMatch: {$gte: 4, $lte:5}}})
+
+![](img/p75.png)
 
 ### 模糊查询
 
@@ -545,61 +556,123 @@ name里面第二个元素等于tianjing的记录
 
 ![](img/p73.png)
 
+### $where 类似于SQL里面的WHERE
 
+> db.personalinfo.find({$where: 'this.age > 10'})
 
+![](img/p76.png)
 
+### 直接所有JavaScript表达式，类似于SQL里面的存储过程
 
+> db.personalinfo.find(myExp)
 
+![](img/p77.png)
 
+### 跨域多列的复杂查询
 
+> db.test.find({$where: 'this.a + this.b + this.c == 11'})
 
+> db.test.find({$where: 'function(){return this.a + this.b + this.c == 11;}'})
 
+![](img/p78.png)
 
+### count() 统计记录条数, 分页
 
+> db.personalinfo.find().count()
 
+![](img/p79.png)
 
+### skip() 忽略掉前几条, 分页
 
+忽略掉第一条
 
+> db.personalinfo.find().skip(1)
 
+忽略掉前两条
 
+> db.personalinfo.find().skip(2)
 
+![](img/p80.png)
 
+### limit() 限制返回条数, 分页
 
+> db.personalinfo.find().skip(1).limit(1)
 
+![](img/p81.png)
 
+### 返回加了限制条件后真实的记录条数
 
+> db.personalinfo.find().skip(1).limit(1).count(true)
 
+不能使用下面这个
 
+> db.personalinfo.find().skip(1).limit(1).count()
 
+![](img/p83.png)
 
+### sort() 排序
 
+升序
 
+> db.personalinfo.find().sort({age: 1})
 
+降序
 
+> db.personalinfo.find().sort({age: -1})
 
+![](img/p82.png)
 
+### sort() 多字段排序
 
+> db.personalinfo.find().sort({age: 1, name:-1})
 
+![](img/p84.png)
 
+### distinct() 去重
 
+> db.personalinfo.distinct('age')
 
+加了条件的去重
+> db.personalinfo.distinct('age', {age: {$gt: 10}})
 
+> db.runCommand({'distinct': 'personalinfo', key: 'age'})
 
+![](img/p86.png)
 
+### 聚合框架
 
+group 无法操作分片，mapReduce可以。
 
+已经分完组了， 每个组都会执行reduce函数。
 
+定义：
+> db.collection.group({ key, reduce, initial \[, keyf] \[, cond] \[, finalize] })
 
+被废弃了
+> Mongodb 3.4 deprecates the db.collection.group() method. Use db.collection.aggregate() with the $group stage or db.collection.mapReduce() instead.
 
+初始化：
+> for(var i = 1; i < 30; i++){ var count = i%5; db.mygroup.save({name: 'name'+i, count:count}); }
 
+执行分组函数：
+> db.mygroup.group({key: {count: true}, initial: {totalCount: 0}, reduce: function(current, aggregator){aggregator.totalCount++;}});
 
+字段说明：
+> key: 要分组的字段。
 
+> initial: 分组后对每一组进行聚合操作时的初始值， 在每一个组里面是共享的，不同组里面是隔离的。
 
+> reduce: 对于每一组中的每一条记录都会执行该函数，current表示当前记录，aggregator聚合器它的初始值是initial里面的对象，每个分组的aggregator都是独立的。
 
+> key和initial里面的字段会被输出出来。
 
+![](img/p87.png)
 
+![](img/p88.png)
 
+> db.mygroup.group({key: {count: true}, initial: {totalCount: 0}, reduce: function(current, aggregator){aggregator.totalCount+= current.count;}});
 
+![](img/p89.png)
 
 
 
