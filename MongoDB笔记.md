@@ -680,68 +680,187 @@ group 无法操作分片，mapReduce可以。
 
 ![](img/p90.png)
 
+注意：
+
+> db.collection.group() 使用的是keyf和reduce；而group command 使用的是$keyf和$reduce。
+
+求最大值
+
+> for(var i = 1; i < 30; i++){ var count = i % 5; db.mygroup.insert({name: "name" + i, age: i, count: count}); }
+
+> db.mygroup.group({key: {count: 1}, initial: {maxAge: -1}, reduce: function(current, aggregator){if(current.age > aggregator.maxAge){aggregator.maxAge = current.age;}}})
+
+![](img/p91.png)
 
 
+求最小值
+
+> db.mygroup.group({key: {count: 1}, initial: {minAge: 0, myCount: 0}, reduce: function(current, aggregator){if(aggregator.myCount == 0){aggregator.minAge = current.age}else{if(current.age < aggregator.minAge){aggregator.minAge = current.age;}}aggregator.myCount++;}})
+
+![](img/p92.png)
+
+求平均值
+
+> db.mygroup.group({key: {count: 1}, initial: {totalAge: 0, totalCount: 0}, reduce: function(current, aggregator){aggregator.totalAge += current.age; aggregator.totalCount++;}, finalize: function(aggregator){aggregator.avgAge = aggregator.totalAge / aggregator.totalCount;}})
+
+![](img/p93.png)
+
+删掉某些不需要的属性
+
+> db.mygroup.group({key: {count: 1}, initial: {totalAge: 0, totalCount: 0}, reduce: function(current, aggregator){aggregator.totalAge += current.age; aggregator.totalCount++;}, finalize: function(aggregator){aggregator.avgAge = aggregator.totalAge / aggregator.totalCount;  delete aggregator.totalCount; delete aggregator.count; }})
+
+![](img/p94.png)
+
+按名字长度分组
+
+> db.mygroup.group({keyf: function(current){return {name: current.name.length}}, initial: {totalAge: 0, totalCount: 0}, reduce: function(current, aggregator){aggregator.totalAge += current.age; aggregator.totalCount++;}, finalize: function(aggregator){aggregator.avgAge = aggregator.totalAge / aggregator.totalCount;  delete aggregator.totalCount; delete aggregator.count; }})
+
+![](img/p95.png)
 
 
+### Map-Reduce
+
+#### Map-Reduce可以在分片的环境下执行，Group不能在分片的环境下执行
+
+> Map-Reduce分为两个阶段: Map阶段，Reduce阶段。Reduce阶段的输入来自于Map的输出。所以Map是先执行的，Reduce是后执行的。
+
+> Map映射作用，将相同key的值放到一个数组当中。
+
+> Map函数里面必须调用emit()方法。
+
+> 对于Map阶段后有多个值的key会进行Reduce阶段，一个值的不会(执行不执行reduce函数都没效果)。
+
+![](img/p96.png)
+
+#### mapReduce方法
+
+```javascript
+db.collection.mapReduce(
+                         <map>,
+                         <reduce>,
+                         {
+                           out: <collection>,
+                           query: <document>,
+                           sort: <document>,
+                           limit: <number>,
+                           finalize: <function>,
+                           scope: <document>,
+                           jsMode: <boolean>,
+                           verbose: <boolean>,
+                           bypassDocumentValidation: <boolean>
+                         }
+                       )
+
+```
+
+#### 示例
+
+> for(var i = 1; i < 10 ;i++){ var count = i%3; db.student.insert({name: 'name'+i,age:i,count: count}); }
+
+求记录条数
+
+> db.student.mapReduce(function(){emit(this.count, 1)}, function(key, values){return values.length;}, {out: 'aa'})
+
+![](img/p97.png)
+
+求总和
+
+> db.student.mapReduce(function(){emit(this.count, this.age)}, function(key, values){var totalAge = 0; for(var i = 0; i < values.length; i++){totalAge+=values[i];} return totalAge;}, {out: 'aa'})
+
+![](img/p98.png)
+
+> db.student.mapReduce(function(){emit(this.count, {age: this.age});}, function(key, values){var totalAge = 0; values.forEach(function(current){totalAge += current.age;}); return totalAge;}, {out: 'aa'})
+
+![](img/p99.png)
+
+### group reduce VS map reduce
 
 
+group reduce:
+
+方法签名：
+> function(current, aggregator){}
+
+> 各个分组里面有多少条数据方法就会执行多少次，aggregator每次执行该方法都在不断累加。该方法不断执行不知道什么时候执行完(组里面有多少条记录就会执行多少次)。
 
 
+map reduce:
+
+方法签名：
+
+> function(key, values){}
+
+> 各个分组只会执行一次。
 
 
+求最大值：
+
+> db.student.mapReduce(function(){emit(this.count, this.age);}, function(key, values){var maxAge = values[0]; values.forEach(function(current){if(current > maxAge){maxAge = current;}}); return maxAge;}, {out: 'aa'})
+
+![](img/p100.png)
+
+求最小值：
+
+> db.student.mapReduce(function(){emit(this.count, this.age);}, function(key, values){var minAge = values[0]; values.forEach(function(current){if(current < minAge){minAge = current;}}); return minAge;}, {out: 'aa'})
+
+![](img/p101.png)
+
+求平均值：
+
+> db.student.mapReduce(function(){emit(this.count, this.age);}, function(key, values){var totalAge = 0; values.forEach(function(current){totalAge += current;}); return totalAge / values.length;}, {out: 'aa'})
+
+![](img/p102.png)
+
+求标签出现的次数。
+
+> var map = function(){this.tags.forEach(function(tag){emit(tag, 1)})}
+
+> var reduce = function(key, values){var sum = 0; values.forEach(function(current){sum += current;}); return sum;}
+
+> db.article.mapReduce(map, reduce, {out: "aa"})
+
+![](img/p103.png)
+
+### 内联的方式输出
+
+> db.article.mapReduce(map, reduce, {out: {inline: true}})
+
+![](img/p104.png)
+
+### 当map中发射的值只有一个时是不会执行reduce函数的
+
+![](img/p105.png)
+
+> var reduce = function(key, values){var sum = 0; values.forEach(function(current){sum += current.count;}); return {count:sum};}
+
+### map-reduce的finalize
+
+> var map = function(){this.tags.forEach(function(tag){emit(tag, {count: 1})})}
+
+> var reduce = function(key, values){var sum = 0; values.forEach(function(current){sum += current.count;}); return {count: sum};}
+
+> var finalize = function(key, reducedValues){if(reducedValues.count == undefined){return reducedValues;}else{return reducedValues.count;}}
+
+> db.article.mapReduce(map, reduce, {out: 'aa', finalize: finalize})
+
+![](img/p106.png)
+
+> db.runCommand({mapReduce: 'article', map: map, reduce: reduce, out: 'aa', finalize: finalize})
+
+![](img/p107.png)
 
 
+### map中过滤
 
+> var map = function(){ var flag = false; for(i in this.tags){if(this.tags\[i] == 'java'){flag = true;}}; if(flag){  this.tags.forEach(function(tag){emit(tag, {count: 1})})}}
 
+> var reduce = function(key, values){var sum = 0; values.forEach(function(current){sum += current.count;}); return {count: sum};}
 
+> var finalize = function(key, reducedValues){if(reducedValues.count == undefined){return reducedValues;}else{return reducedValues.count;}}
 
+> db.runCommand({mapReduce: 'article', map: map, reduce: reduce, out: 'aa', finalize: finalize})
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+![](img/p108.png)
 
 
 
