@@ -863,53 +863,70 @@ map reduce:
 ![](img/p108.png)
 
 
+## 聚合框架
+
+> 与Map-Reduce一样可以用在分片环境下, Group只能用在单机环境下。
+
+> 聚合框架是不能写函数，不能讲自定义的函数传入聚合框架里。
+
+分组求和：
+
+> db.commodity.aggregate({$group: {_id: "$category", totalCount: {$sum: 1}}})
+
+![](img/p109.png)
+
+> db.commodity.aggregate({$group: {_id: "$category", totalCount: {$sum: 1}, totalPrice: {$sum: '$price'}}})
+
+![](img/p110.png)
+
+排序
+
+> db.commodity.aggregate({$group: {_id: "$category", totalCount: {$sum: 1}, totalPrice: {$sum: '$price'}}}, {$sort: {totalPrice: -1}})
+
+![](img/p111.png)
+
+平均值：
+
+> db.commodity.aggregate({$group: {_id: "$category", totalCount: {$sum: 1}, totalPrice: {$sum: '$price'}, avgPrice: {$avg: '$price'}}}, {$sort: {totalPrice: -1}})
+
+![](img/p112.png)
+
+数组展开
+
+> db.article.aggregate({$unwind: '$tags'}, {$group: {_id: '$tags', total: {$sum: 1}}})
+
+![](img/p113.png)
+
+过滤:
+
+> db.article.aggregate({$match: {tags: {$in: \['java']}}}, {$unwind: '$tags'}, {$group: {_id: '$tags', total: {$sum: 1}}})
+
+![](img/p114.png)
+
+排序：
+> db.article.aggregate({$match: {tags: {$nin: \['java']}}}, {$unwind: '$tags'}, {$group: {_id: '$tags', total: {$sum: 1}}}, {$sort: {total: -1}})
+
+限制返回条数：
+> db.article.aggregate({$match: {tags: {$nin: \['java']}}}, {$unwind: '$tags'}, {$group: {_id: '$tags', total: {$sum: 1}}}, {$sort: {total: -1}}, {$limit: 3})
+
+![](img/p115.png)
+
+忽略掉前几条
+> db.article.aggregate({$match: {tags: {$nin: \['java']}}}, {$unwind: '$tags'}, {$group: {_id: '$tags', total: {$sum: 1}}}, {$sort: {total: -1}}, {$skip:1}, {$limit: 3})
+
+限制返回列
+> db.article.aggregate({$match: {tags: {$nin: \['java']}}}, {$unwind: '$tags'}, {$group: {_id: '$tags', total: {$sum: 1}}}, {$sort: {total: -1}}, {$skip:1}, {$limit: 3}, {$project: {total:1, _id:0}})
+
+![](img/p116.png)
+
+添加新字段
+> db.article.aggregate({$match: {tags: {$nin: \['java']}}}, {$unwind: '$tags'}, {$group: {_id: '$tags', total: {$sum: 1}}}, {$sort: {total: -1}}, {$skip:1}, {$limit: 3}, {$project: {total:1, _id:0, hello: {$add: ['$total', 100]}}})
+
+![](img/p118.png)
+
+### $group的$addToSet将分组之后的key放到一个数组当中。
 
 
+> db.article.aggregate({$match: {tags: {$nin: \['java']}}}, {$unwind: '$tags'}, {$group: {_id: '$tags', total: {$sum: 1}, myTag: {$addToSet: '$tags'}}}, {$sort: {total: -1}}, {$skip:1}, {$limit: 3}, {$project: {total:1, myTag:1,_id:0, hello: {$add: ['$total', 100]}}})
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+![](img/p119.png)
