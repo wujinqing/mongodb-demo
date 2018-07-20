@@ -1005,55 +1005,111 @@ map reduce:
 
 ![](img/p128.png)
 
+### 索引
+
+> 加快查询效率，降低写(增、删、改)效率。
+
+> 最多键3到4个索引。
+
+> 默认情况下MongoDB在创建集合时都会对_id创建索引， 而且这个索引是无法删除的。
 
 
+查看一个集合里面的所有索引
+
+> db.myindex.getIndexes()
+
+![](img/p129.png)
 
 
+按age升序创建索引
+
+> db.myindex.createIndex({age: 1})
+
+![](img/p130.png)
+
+删除某个字段上的索引
+
+> db.myindex.dropIndex({name: 1})
+
+![](img/p131.png)
 
 
+删除所有索引(除了_id)
+
+> db.myindex.dropIndexes()
+
+![](img/p132.png)
+
+指定一个索引名称
+
+> db.myindex.createIndex({age: 1}, {name: 'helloindex'})
+
+![](img/p133.png)
+
+以后台的方式去建索引，并不会阻塞当前的操作
+
+> db.myindex.createIndex({name: 1}, {name: 'worldindex', background: true})
+
+![](img/p134.png)
+
+创建唯一索引
+
+> db.myindex.createIndex({name: 1}, {unique: true})
+
+![](img/p135.png)
+
+### 查询计划
+
+查看查询计划
+
+> db.myindex.find({name: 'zhangsan'}).explain()
+
+有indexBounds说明用到了索引。
+
+![](img/p136.png)
 
 
+通过hint强制使用索引
+
+> db.myindex.find({age: {$gt: 5}}).hint({name: 1}).explain()
+
+对整个集合进行重建索引
+
+> db.myindex.reIndex()
+
+![](img/p137.png)
+
+对当前数据库进行重建索引，慎用，很慢, 不建议在生产系统使用。
+
+> db.repairDatabase()
+
+![](img/p138.png)
+
+### 复合索引
+
+创建一个复合索引
+
+> db.myindex.createIndex({name: -1, age: 1})
+
+![](img/p139.png)
+
+### MongoDB Profiling 优化器
+类似MySQL的慢查询
+
+不需要自己创建数据库，会自动创建，使用use会自动创建
 
 
+查看慢查询设置信息
+> db.getProfilingStatus()
 
 
+开启慢查询, 0 不开启, 1 根据执行时间记录, 2 记录所有
 
+> db.setProfilingLevel(1)
 
+慢查询信息都存放在system.profile这个集合当中。
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+![](img/p140.png)
 
 
 
