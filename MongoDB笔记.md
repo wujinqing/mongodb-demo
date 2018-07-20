@@ -1111,7 +1111,9 @@ map reduce:
 
 ![](img/p140.png)
 
+执行时间超过200毫秒为慢查询
 
+> db.setProfilingLevel(1, {slowms: 200})
 
 
 
