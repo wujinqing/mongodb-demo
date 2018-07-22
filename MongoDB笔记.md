@@ -1115,7 +1115,17 @@ map reduce:
 
 > db.setProfilingLevel(1, {slowms: 200})
 
+### Replica Set 副本集
 
+![](img/p141.png)
+
+![](img/p142.png)
+
+搭建副本集的四要素：
+1. MongoDB数据文件存储路径。
+2. MongoDB日志文件存储路径
+3. MongoDB key 文件存储路径(什么是key文件， 就是一个普通文本文件，只要保证复制集中所有key文件内容相同就行)
+4. MongoDB 实例监听端口号
 
 
 
