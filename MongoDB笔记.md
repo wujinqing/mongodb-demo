@@ -1127,15 +1127,9 @@ map reduce:
 3. MongoDB key 文件存储路径(什么是key文件， 就是一个普通文本文件，只要保证复制集中所有key文件内容相同就行)
 4. MongoDB 实例监听端口号
 
+### db.article.find().pretty()格式化输出结果
 
-
-
-
-
-
-
-
-
+![](img/p153.png)
 
 
 
